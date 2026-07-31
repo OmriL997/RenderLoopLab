@@ -1,0 +1,72 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+_build/
+
+# CMake artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+*.cmake
+!cmake/CompilerWarnings.cmake
+!cmake/Sanitizers.cmake
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.sln.docstates
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+
+# CLion
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Generated benchmark output
+benchmark.csv
+benchmark.json
+*.bench.csv
+*.bench.json
+
+# Temporary shader files (not the source)
+# (real shaders live in assets/shaders/)
+*.spv
+
+# OS-specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.envrc
+
+# User-specific VSCode settings (keep shared config)
+.vscode/*.code-workspace
+
+# Compiler temporaries
+*.o
+*.obj
+*.d
+*.a
+*.so
+*.dylib
+
+# CMake presets (user-specific)
+CMakeUserPresets.json
