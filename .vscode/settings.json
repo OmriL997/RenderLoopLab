@@ -1,0 +1,12 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.configureArgs": [
+    "-DRLL_BUILD_TESTS=ON"
+  ],
+  "editor.formatOnSave": true,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "files.associations": {
+    "*.vert": "glsl",
+    "*.frag": "glsl"
+  }
+}

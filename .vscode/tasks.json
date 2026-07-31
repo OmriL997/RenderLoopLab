@@ -1,0 +1,88 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake: Configure (Debug)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-B", "build",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DRLL_BUILD_TESTS=ON"
+      ],
+      "group": "build",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "CMake: Configure (Release)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-B", "build",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DRLL_BUILD_TESTS=ON"
+      ],
+      "group": "build",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "CMake: Build (Debug)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "--parallel"],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always" },
+      "dependsOn": "CMake: Configure (Debug)"
+    },
+    {
+      "label": "CMake: Build (Release)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "--config", "Release", "--parallel"],
+      "group": "build",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Run: Unit Tests",
+      "type": "shell",
+      "command": "ctest",
+      "args": ["--test-dir", "build", "--output-on-failure"],
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Run: Interactive Demo",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/bin/renderlooplab",
+      "args": [],
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Run: Benchmark",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/bin/renderlooplab",
+      "args": [
+        "--benchmark",
+        "--sprites", "500",
+        "--frames", "600",
+        "--warmup", "60",
+        "--no-vsync",
+        "--csv", "benchmark.csv",
+        "--report", "benchmark.json"
+      ],
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Run: Smoke Test",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/bin/renderlooplab",
+      "args": [
+        "--smoke-test",
+        "--frames", "120",
+        "--hidden",
+        "--sprites", "100"
+      ],
+      "presentation": { "reveal": "always" }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: Interactive Demo",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/renderlooplab.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug: Interactive Demo (Linux)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/renderlooplab",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "Debug: Benchmark",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/renderlooplab.exe",
+      "args": [
+        "--benchmark",
+        "--sprites", "500",
+        "--frames", "600",
+        "--warmup", "60",
+        "--no-vsync"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug: Smoke Test",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/renderlooplab.exe",
+      "args": [
+        "--smoke-test",
+        "--frames", "120",
+        "--hidden",
+        "--sprites", "100"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "console": "integratedTerminal"
+    }
+  ]
+}

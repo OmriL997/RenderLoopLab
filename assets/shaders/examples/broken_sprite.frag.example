@@ -1,0 +1,21 @@
+// This file is intentionally broken for manual hot-reload testing.
+// Rename to sprite.frag, press F5 in the running application,
+// and verify that the renderer gracefully retains the previous shader.
+//
+// It is NOT compiled as part of the normal build.
+
+#version 330 core
+
+in  vec2 v_TexCoord;
+in  vec4 v_Color;
+
+out vec4 FragColor;
+
+uniform sampler2D u_Texture;
+
+void main()
+{
+    // Syntax error: missing semicolon on next line
+    vec4 bad = texture(u_Texture, v_TexCoord)
+    FragColor = bad * v_Color;
+}
