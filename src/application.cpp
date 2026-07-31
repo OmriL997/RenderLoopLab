@@ -29,29 +29,6 @@ namespace rll {
 namespace fs = std::filesystem;
 
 // ---------------------------------------------------------------------------
-// Asset resolution
-// ---------------------------------------------------------------------------
-
-namespace {
-
-fs::path resolveAssetRoot(const std::string& override)
-{
-    if (!override.empty()) {
-        const fs::path p(override);
-        if (fs::exists(p)) return p;
-        log::warn("Application", "Provided --asset-root does not exist: " + override);
-    }
-
-    // Try next to the executable using SDL_GetBasePath()
-    // SDL is available here, but to keep things simple we use argv[0] fallback
-    // and the documented "adjacent to executable" resolution.
-    // SDL_GetBasePath is called inside Application::Impl so it's fine.
-    return {};
-}
-
-} // anon
-
-// ---------------------------------------------------------------------------
 // PIMPL
 // ---------------------------------------------------------------------------
 
