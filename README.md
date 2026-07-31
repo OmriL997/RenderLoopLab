@@ -8,17 +8,17 @@
 
 ## Overview
 
-RenderLoopLab is a portfolio-scale project designed to demonstrate practical knowledge of real-time application structure, game loops, GPU resource ownership, and automated testing in C++17. It is a focused runtime laboratory — not a general-purpose game engine.
+RenderLoopLab is a portfolio-scale project designed to demonstrate practical knowledge of real-time application structure, game loops, GPU resource ownership, and automated testing in C++17. It is a focused runtime laboratory and not a general-purpose game engine.
 
 ### Features
 
 - **Fixed-timestep simulation** with configurable frequency (default 60 Hz)
 - **Variable-rate rendering** with position interpolation for smooth motion
-- **Dynamic-batch 2D renderer** — all sprites drawn in a single `glDrawElements` call
+- **Dynamic-batch 2D renderer** - all sprites drawn in a single `glDrawElements` call
 - **Move-only RAII wrappers** for all OpenGL resources (VAO, VBO, IBO, shader, texture)
 - **Keyboard and game-controller input** via SDL2
-- **Shader hot reloading** (F5) — failed reloads retain the previous working program
-- **Procedural checkerboard texture** — no external image files required
+- **Shader hot reloading** (F5) - failed reloads retain the previous working program
+- **Procedural checkerboard texture** - no external image files required
 - **Frame-time profiler** with CSV export
 - **Benchmark mode** with JSON summary report
 - **CI smoke-test mode** for headless environments
@@ -180,7 +180,7 @@ built via CMake FetchContent.
 ## Windows Build
 
 ```bat
-git clone https://github.com/your-org/RenderLoopLab.git
+git clone https://github.com/OmriL997/RenderLoopLab.git
 cd RenderLoopLab
 
 cmake -B build -DRLL_BUILD_TESTS=ON
@@ -205,7 +205,7 @@ sudo apt-get install -y build-essential cmake ninja-build \
     libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
     xvfb
 
-git clone https://github.com/your-org/RenderLoopLab.git
+git clone https://github.com/OmriL997/RenderLoopLab.git
 cd RenderLoopLab
 
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DRLL_BUILD_TESTS=ON
