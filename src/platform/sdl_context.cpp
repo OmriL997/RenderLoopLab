@@ -1,6 +1,6 @@
 #include "renderlooplab/platform/sdl_context.hpp"
 #include "renderlooplab/logging.hpp"
-
+#include <string>
 #include <SDL.h>
 
 namespace rll::platform {
