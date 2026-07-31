@@ -8,7 +8,7 @@ namespace rll::gfx {
 
 VertexBuffer::VertexBuffer()
 {
-    glGenBuffers(1, &m_id);
+    // GL object is created lazily in upload() once a context exists.
 }
 
 VertexBuffer::~VertexBuffer()
@@ -46,6 +46,7 @@ void VertexBuffer::unbind() const
 
 void VertexBuffer::upload(const void* data, std::size_t byteSize, GLenum usage)
 {
+    if (m_id == 0) glGenBuffers(1, &m_id);
     glBindBuffer(GL_ARRAY_BUFFER, m_id);
     glBufferData(GL_ARRAY_BUFFER,
                  static_cast<GLsizeiptr>(byteSize),
@@ -68,7 +69,7 @@ void VertexBuffer::uploadSubData(const void* data, std::size_t offsetBytes,
 
 IndexBuffer::IndexBuffer()
 {
-    glGenBuffers(1, &m_id);
+    // GL object is created lazily in upload() once a context exists.
 }
 
 IndexBuffer::~IndexBuffer()
@@ -106,6 +107,7 @@ void IndexBuffer::unbind() const
 
 void IndexBuffer::upload(const void* data, std::size_t byteSize, GLenum usage)
 {
+    if (m_id == 0) glGenBuffers(1, &m_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  static_cast<GLsizeiptr>(byteSize),

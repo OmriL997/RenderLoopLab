@@ -4,7 +4,7 @@ namespace rll::gfx {
 
 VertexArray::VertexArray()
 {
-    glGenVertexArrays(1, &m_id);
+    // GL object is created lazily in bind() once a context exists.
 }
 
 VertexArray::~VertexArray()
@@ -30,8 +30,9 @@ VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
     return *this;
 }
 
-void VertexArray::bind() const
+void VertexArray::bind()
 {
+    if (m_id == 0) glGenVertexArrays(1, &m_id);
     glBindVertexArray(m_id);
 }
 

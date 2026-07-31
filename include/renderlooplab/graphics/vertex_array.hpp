@@ -21,7 +21,7 @@ public:
     VertexArray(VertexArray&& other) noexcept;
     VertexArray& operator=(VertexArray&& other) noexcept;
 
-    void bind  () const;
+    void bind  ();         // non-const: lazily creates the VAO on first call
     void unbind() const;
 
     GLuint handle() const { return m_id; }
