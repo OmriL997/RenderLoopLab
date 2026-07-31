@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  # ── Ubuntu / GCC ──────────────────────────────────────────────────────────
+  ubuntu-gcc:
+    name: Ubuntu (GCC, Release)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev \
+            xvfb
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DRLL_BUILD_TESTS=ON \
+            -DRLL_WARNINGS_AS_ERRORS=ON
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Verify shader assets were copied
+        run: |
+          test -f build/bin/assets/shaders/sprite.vert
+          test -f build/bin/assets/shaders/sprite.frag
+          echo "Shader assets verified."
+
+      - name: Run CPU tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Smoke test (xvfb)
+        run: |
+          xvfb-run -a ./build/bin/renderlooplab \
+            --smoke-test --frames 60 --hidden --sprites 100
+
+      - name: Short benchmark (xvfb)
+        run: |
+          xvfb-run -a ./build/bin/renderlooplab \
+            --benchmark \
+            --sprites 200 \
+            --frames 120 \
+            --warmup 30 \
+            --no-vsync \
+            --hidden \
+            --csv benchmark.csv \
+            --report benchmark.json
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-ubuntu
+          path: |
+            benchmark.csv
+            benchmark.json
+
+  # ── Ubuntu / GCC + Sanitizers (CPU tests only) ───────────────────────────
+  ubuntu-sanitizers:
+    name: Ubuntu (GCC, ASan+UBSan, CPU tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DRLL_BUILD_TESTS=ON \
+            -DRLL_ENABLE_SANITIZERS=ON \
+            -DRLL_WARNINGS_AS_ERRORS=ON
+
+      - name: Build tests only
+        run: cmake --build build --target renderlooplab_tests --parallel
+
+      - name: Run CPU tests (with sanitizers)
+        run: ctest --test-dir build --output-on-failure
+
+  # ── Windows / MSVC ────────────────────────────────────────────────────────
+  windows-msvc:
+    name: Windows (MSVC, Release)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DRLL_BUILD_TESTS=ON `
+            -DRLL_WARNINGS_AS_ERRORS=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Verify shader assets were copied
+        run: |
+          if (!(Test-Path "build\bin\Release\assets\shaders\sprite.vert")) {
+            Write-Error "Shader assets missing"
+            exit 1
+          }
+          Write-Host "Shader assets verified."
+        shell: powershell
+
+      - name: Run CPU tests
+        run: ctest --test-dir build -C Release --output-on-failure
