@@ -45,18 +45,22 @@ jobs:
       - name: Run CPU tests
         run: ctest --test-dir build --output-on-failure
 
-      - name: Smoke test (xvfb)
+      - name: Smoke test (headless EGL)
         env:
-          LIBGL_ALWAYS_SOFTWARE: "1"
+          SDL_VIDEODRIVER: offscreen       # SDL2 offscreen driver — no X11/GLX
+          LIBGL_ALWAYS_SOFTWARE: "1"       # Mesa software rasterizer
+          MESA_LOADER_DRIVER_OVERRIDE: swrast  # force swrast via EGL
         run: |
-          xvfb-run -a -s "-screen 0 1280x720x24" ./build/bin/renderlooplab \
+          ./build/bin/renderlooplab \
             --smoke-test --frames 60 --hidden --sprites 100
 
-      - name: Short benchmark (xvfb)
+      - name: Short benchmark (headless EGL)
         env:
+          SDL_VIDEODRIVER: offscreen
           LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_LOADER_DRIVER_OVERRIDE: swrast
         run: |
-          xvfb-run -a -s "-screen 0 1280x720x24" ./build/bin/renderlooplab \
+          ./build/bin/renderlooplab \
             --benchmark \
             --sprites 200 \
             --frames 120 \
