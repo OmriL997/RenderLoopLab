@@ -89,7 +89,7 @@ private:
 
     // Simulation
     InputState                     m_inputState;
-    Simulation*                    m_sim = nullptr;
+    std::unique_ptr<Simulation>    m_sim = nullptr;
 
     // Profiling
     FrameProfiler                  m_profiler;
@@ -201,7 +201,7 @@ bool Application::Impl::init(std::string& err)
     simCfg.seed        = m_cfg.seed;
     simCfg.worldBounds = {static_cast<float>(m_cfg.width),
                           static_cast<float>(m_cfg.height)};
-    m_sim = new Simulation(simCfg);
+    m_sim = std::make_unique<Simulation>(simCfg);
 
     log::info("Application", "Initialisation complete.");
     return true;
@@ -209,8 +209,7 @@ bool Application::Impl::init(std::string& err)
 
 void Application::Impl::shutdown()
 {
-    delete m_sim;
-    m_sim = nullptr;
+    m_sim.reset();
     log::info("Application", "Shutdown complete.");
 }
 
@@ -267,8 +266,8 @@ void Application::Impl::handleResize(int w, int h)
         // Keep world bounds in sync with drawable size
         SimulationConfig sc = m_sim->config();
         sc.worldBounds = {static_cast<float>(w), static_cast<float>(h)};
-        delete m_sim;
-        m_sim = new Simulation(sc);
+        m_sim.reset();
+        m_sim = std::make_unique<Simulation>(sc);
     }
 }
 
