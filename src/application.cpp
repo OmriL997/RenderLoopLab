@@ -48,6 +48,8 @@ private:
 
     fs::path shaderPath(const std::string& filename) const;
     bool     loadShaders(bool isReload);
+    void     testBrokenShader();
+    void     cycleSpriteCount();
 
     void handleResize(int w, int h);
     void updateWindowTitle(double fps, double frameMs, int sprites);
@@ -75,7 +77,10 @@ private:
     fs::path                       m_assetRoot;
     int                            m_drawableW = 0;
     int                            m_drawableH = 0;
-    bool                           m_vsync     = true;
+    bool                           m_vsync       = true;
+    bool                           m_useAltShader    = false;
+    std::string                    m_shaderLabel     = "default";
+    int                            m_spritePresetIdx = 2;  // index into k_spritePresets
 };
 
 // ---------------------------------------------------------------------------
@@ -201,9 +206,14 @@ fs::path Application::Impl::shaderPath(const std::string& filename) const
 
 bool Application::Impl::loadShaders(bool isReload)
 {
-    const std::string vertPath = shaderPath("sprite.vert").string();
-    const std::string fragPath = shaderPath("sprite.frag").string();
     const char* tag = isReload ? "ShaderReload" : "ShaderProgram";
+
+    // On hot-reload, toggle between default and alt shader.
+    if (isReload) m_useAltShader = !m_useAltShader;
+
+    const std::string fragName = m_useAltShader ? "sprite_alt.frag" : "sprite.frag";
+    const std::string vertPath = shaderPath("sprite.vert").string();
+    const std::string fragPath = shaderPath(fragName).string();
 
     gfx::ShaderProgram newShader;
     std::string err;
@@ -211,6 +221,9 @@ bool Application::Impl::loadShaders(bool isReload)
     if (!gfx::ShaderProgram::createFromFiles(vertPath, fragPath, newShader, err)) {
         log::error(tag, err);
         if (isReload) {
+            // Revert toggle — keep previous shader active
+            m_useAltShader = !m_useAltShader;
+            m_shaderLabel += " [reload failed]";
             log::error(tag, "Shader reload failed. Previous shader program remains active.");
         }
         return false;
@@ -219,12 +232,53 @@ bool Application::Impl::loadShaders(bool isReload)
     m_shader = std::move(newShader);
 
     if (isReload) {
-        log::info(tag, "Shader reload succeeded: sprite.vert + sprite.frag");
-        // Renderer holds a pointer to m_shader — it is still the same address,
-        // but we must re-set the projection uniform via the new program.
+        m_shaderLabel = m_useAltShader ? "alt (grayscale)" : "default";
+        log::info(tag, std::string("Shader reload succeeded: sprite.vert + ") + fragName);
+        // Renderer holds a pointer to m_shader — re-set the projection uniform.
         m_renderer.setProjection(m_drawableW, m_drawableH);
     }
     return true;
+}
+
+void Application::Impl::testBrokenShader()
+{
+    const std::string vertPath = shaderPath("sprite.vert").string();
+    const std::string fragPath =
+        (m_assetRoot / "shaders" / "examples" / "broken_sprite.frag.example").string();
+
+    gfx::ShaderProgram dummy;
+    std::string err;
+
+    log::info("ShaderReload", "Testing broken shader compile (fallback demo)...");
+    if (!gfx::ShaderProgram::createFromFiles(vertPath, fragPath, dummy, err)) {
+        log::error("ShaderReload", err);
+        log::info("ShaderReload",
+            "Compile failed as expected — previous shader remains active.");
+        m_shaderLabel += " [err: compile failed]";
+    }
+    // dummy is destroyed here; m_shader is untouched
+}
+
+// ---------------------------------------------------------------------------
+// Sprite count cycling
+// ---------------------------------------------------------------------------
+
+static constexpr int k_spritePresets[] = { 20, 100, 500, 1000, 5000 };
+static constexpr int k_numPresets =
+    static_cast<int>(sizeof(k_spritePresets) / sizeof(k_spritePresets[0]));
+
+void Application::Impl::cycleSpriteCount()
+{
+    m_spritePresetIdx = (m_spritePresetIdx + 1) % k_numPresets;
+    const int count = k_spritePresets[m_spritePresetIdx];
+
+    SimulationConfig sc = m_sim->config();
+    sc.numSprites = count;
+    m_sim.reset();
+    m_sim = std::make_unique<Simulation>(sc);
+
+    log::info("Application",
+        "Sprite count changed to " + std::to_string(count));
 }
 
 // ---------------------------------------------------------------------------
@@ -256,9 +310,14 @@ void Application::Impl::updateWindowTitle(double fps, double frameMs, int sprite
 {
     char buf[256];
     std::snprintf(buf, sizeof(buf),
-        "RenderLoopLab | %.1f FPS | %.2f ms | Sprites: %d",
-        fps, frameMs, sprites);
+        "RenderLoopLab | %s | %.1f FPS | %.2f ms | Sprites: %d",
+        m_shaderLabel.c_str(), fps, frameMs, sprites);
     m_window.setTitle(buf);
+
+    // Clear transient error suffix after showing it once
+    const auto errPos = m_shaderLabel.find(" [");
+    if (errPos != std::string::npos)
+        m_shaderLabel.erase(errPos);
 }
 
 // ---------------------------------------------------------------------------
@@ -296,6 +355,12 @@ int Application::Impl::runInteractive()
         // Handle special one-shot actions
         if (m_inputState.isPressed(InputAction::ReloadShaders)) {
             loadShaders(true);
+        }
+        if (m_inputState.isPressed(InputAction::TestBrokenShader)) {
+            testBrokenShader();
+        }
+        if (m_inputState.isPressed(InputAction::CycleSpriteCount)) {
+            cycleSpriteCount();
         }
         if (m_inputState.isPressed(InputAction::ToggleVSync)) {
             m_vsync = !m_vsync;

@@ -1,0 +1,36 @@
+{
+  "tool": "RenderLoopLab",
+  "tool_version": "0.1.0",
+  "mode": "benchmark",
+  "environment": {
+    "operating_system": "Windows 11",
+    "compiler": "MSVC 19.43",
+    "gpu_vendor": "NVIDIA Corporation",
+    "gpu_renderer": "NVIDIA GeForce RTX 4060 Ti/PCIe/SSE2",
+    "opengl_version": "4.6.0 NVIDIA 572.16"
+  },
+  "configuration": {
+    "width": 1280,
+    "height": 720,
+    "sprites": 500,
+    "frames": 300,
+    "warmup_frames": 60,
+    "seed": 12345,
+    "fixed_hz": 60.0,
+    "vsync": false
+  },
+  "rendering": {
+    "average_draw_calls": 1.00,
+    "average_triangles": 1000.00
+  },
+  "timing_ms": {
+    "minimum": 16.31,
+    "maximum": 17.14,
+    "mean": 16.49,
+    "median": 16.49,
+    "percentile_95": 16.73,
+    "percentile_99": 17.01,
+    "standard_deviation": 0.11
+  },
+  "average_fps": 60.64
+}

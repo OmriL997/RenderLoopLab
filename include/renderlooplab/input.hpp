@@ -16,6 +16,8 @@ enum class InputAction {
     MoveDown,
     ReloadShaders,
     ToggleVSync,
+    TestBrokenShader,   ///< F6  — demo: attempt broken shader compile (fallback demo)
+    CycleSpriteCount,   ///< Tab — cycle through sprite count presets
     Quit,
 
     Count  ///< Sentinel — keep last

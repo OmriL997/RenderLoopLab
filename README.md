@@ -1,5 +1,7 @@
 # RenderLoopLab
 
+[![CI](https://github.com/OmriL997/RenderLoopLab/actions/workflows/ci.yml/badge.svg)](https://github.com/OmriL997/RenderLoopLab/actions/workflows/ci.yml)
+
 **RenderLoopLab** is a C++17 real-time 2D rendering laboratory built with SDL2 and OpenGL 3.3. It demonstrates a fixed-timestep simulation, variable-rate rendering, keyboard and controller input, move-only RAII wrappers for GPU resources, shader hot reloading, and frame-time benchmarking.
 
 **C++17、SDL2、OpenGL 3.3で実装したリアルタイム2Dレンダリング実験環境です。固定タイムステップ、可変レート描画、キーボード／ゲームパッド入力、GPUリソースのRAII管理、シェーダーのホットリロード、フレーム時間計測およびベンチマーク出力を備えています。**
@@ -37,10 +39,114 @@ RenderLoopLab is a portfolio-scale project designed to demonstrate practical kno
 | **D / Right Arrow** | Move player right |
 | **Left analog stick** | Move player (game controller) |
 | **D-pad** | Move player (game controller) |
-| **F5** | Reload shaders from disk |
+| **F5** | Toggle shaders (default ↔ alt grayscale) |
+| **F6** | Attempt broken shader compile (fallback demo) |
+| **Tab** | Cycle sprite count (20 → 100 → 500 → 1000 → 5000) |
 | **F1** | Toggle VSync |
 | **Escape** | Quit |
 | **Y button (controller)** | Reload shaders |
+
+---
+
+## Demo
+
+### Shader Hot-Reload (F5)
+
+Press **F5** to toggle between two live fragment shaders — no restart required:
+
+| State | Window title | Visual |
+|---|---|---|
+| Before | `RenderLoopLab \| default \| 60.0 FPS \| …` | Full-colour sprites |
+| After  | `RenderLoopLab \| alt (grayscale) \| 60.0 FPS \| …` | Grayscale sprites |
+
+Press **F5** again to switch back. The shaders are recompiled from disk each time.
+
+### Shader Compile Failure & Fallback (F6)
+
+Press **F6** to deliberately compile a broken shader (`broken_sprite.frag.example`).
+The GLSL error is printed to the console, rendering continues uninterrupted,
+and the window title briefly shows `[err: compile failed]`:
+
+```
+[ERROR] [ShaderReload] Testing broken shader compile (fallback demo)...
+[ERROR] [ShaderReload] Fragment shader compilation failed (broken_sprite.frag.example):
+        ERROR: 0:19: '' : syntax error: #version
+[INFO]  [ShaderReload] Compile failed as expected — previous shader remains active.
+```
+
+### Benchmark Output
+
+```
+RenderLoopLab Benchmark
+-----------------------
+Resolution:          1280x720
+Sprites:             500
+Warmup frames:       60
+Measured frames:     300
+Seed:                12345
+VSync:               off
+
+Average frame time:  16.49 ms
+Average FPS:         60.64
+Minimum:             16.31 ms
+Maximum:             17.14 ms
+Median:              16.49 ms
+95th percentile:     16.73 ms
+99th percentile:     17.01 ms
+Std deviation:       0.11 ms
+Avg draw calls/frame: 1.00
+Avg triangles/frame:  1000.00
+```
+
+### CSV Output (`demo/example_benchmark.csv`)
+
+```
+frame,input_ms,update_ms,render_ms,swap_ms,total_ms,updates,draw_calls,sprites
+0,0.04,0.31,0.52,15.62,16.49,1,1,500
+1,0.03,0.29,0.51,15.68,16.51,1,1,500
+2,0.03,0.30,0.53,15.61,16.47,1,1,500
+...
+```
+
+### JSON Report (`demo/example_benchmark.json`)
+
+```json
+{
+  "tool": "RenderLoopLab",
+  "environment": { "operating_system": "Windows 11", "compiler": "MSVC 19.43",
+                   "gpu_renderer": "NVIDIA GeForce RTX 4060 Ti/PCIe/SSE2" },
+  "timing_ms": { "mean": 16.49, "percentile_95": 16.73, "percentile_99": 17.01 },
+  "average_fps": 60.64
+}
+```
+
+Full example files are in [`demo/`](demo/).
+
+### Test Count
+
+```
+69 test cases / 336 assertions — all pass
+```
+
+Run with: `ctest --test-dir build -C Release --output-on-failure`
+
+### CI Environments
+
+| Job | Platform | What runs |
+|---|---|---|
+| `ubuntu-gcc` | Ubuntu (GCC, Release) | Build → tests → smoke test → benchmark → artifact upload |
+| `ubuntu-sanitizers` | Ubuntu (GCC, ASan+UBSan) | CPU tests under AddressSanitizer + UBSan |
+| `windows-msvc` | Windows (MSVC, Release) | Build → asset check → CPU tests |
+
+Run the full local demo:
+```powershell
+# Windows
+powershell -ExecutionPolicy Bypass -File demo\run_demo.ps1
+```
+```bash
+# Linux / macOS
+bash demo/run_demo.sh
+```
 
 ---
 

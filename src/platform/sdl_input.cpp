@@ -93,8 +93,10 @@ bool SdlInput::processEvents(InputState& state, bool& quit)
                 case SDLK_s: case SDLK_DOWN:   setKey(InputAction::MoveDown);     break;
                 case SDLK_a: case SDLK_LEFT:   setKey(InputAction::MoveLeft);     break;
                 case SDLK_d: case SDLK_RIGHT:  setKey(InputAction::MoveRight);    break;
-                case SDLK_F5:                   setKey(InputAction::ReloadShaders);break;
-                case SDLK_F1:                   setKey(InputAction::ToggleVSync);  break;
+                case SDLK_F5:                   setKey(InputAction::ReloadShaders);    break;
+                case SDLK_F6:                   setKey(InputAction::TestBrokenShader);  break;
+                case SDLK_F1:                   setKey(InputAction::ToggleVSync);       break;
+                case SDLK_TAB:                  setKey(InputAction::CycleSpriteCount);  break;
                 case SDLK_ESCAPE:
                     state.setPressed(InputAction::Quit, true);
                     state.setHeld   (InputAction::Quit, true);
